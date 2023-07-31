@@ -21,6 +21,7 @@ import umstj.nt_tcp.DTO.CarConnectDTO;
 public class TCPServer {
 
     private final List<ClientHandler> connectedClients = new ArrayList<>();
+    public final Logger logger = LoggerFactory.getLogger(TCPServer.class);
 
     private List<CarConnectDTO> carConnectList = new ArrayList<>();
 
@@ -30,7 +31,7 @@ public class TCPServer {
 
     @PostConstruct
     public void start(){
-        Logger logger = LoggerFactory.getLogger(TCPServer.class);
+
 
 
         new Thread(() -> {
@@ -109,7 +110,8 @@ public class TCPServer {
     public void broadcastNavNode(int rfid ,int carId){
         for (CarConnectDTO carConnectDTO : carConnectList){
             if (carConnectDTO.getCarId() == carId){
-                sendMessages(carConnectDTO.getClientSocket(),"{\"nav_node\":"+rfid +"}");
+                sendMessages(carConnectDTO.getClientSocket(),"{\"type\": \"nav_end\", \"nav_end\":{\"plan_node \":"+rfid +"}}");
+                logger.info("{\"type\": \"nav_end\", \"nav_end\":{\"plan_node \":"+rfid +"}}");
             }
         }
 
@@ -133,11 +135,8 @@ public class TCPServer {
         public void run() {
             try {
                 in = new DataInputStream(clientSocket.getInputStream());
-
-
                 byte[] buffer = new byte[1024];
                 int bytesRead;
-
                 bytesRead = in.read(buffer);
                 String message_rev = socketRead(buffer);
                 logger.info("Received message from client: " + message_rev);

@@ -18,9 +18,6 @@ public class MessageController {
         this.uPnpServer = uPnpServer;
     }
 
-
-
-
     @GetMapping("/")
     public String getDefaultMessage(){
         return "HTTP OK";
