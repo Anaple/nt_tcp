@@ -1,17 +1,37 @@
 package umstj.nt_tcp.component;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
 
-@ServerEndpoint("/websocket") // WebSocket服务端的URL路径
+import java.util.ArrayList;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
+@ServerEndpoint("/ws") // WebSocket服务端的URL路径
+@Component
 public class TyrusWebSocketServer {
+    private static final Logger logger = LoggerFactory.getLogger(TyrusWebSocketServer.class);
+    /**
+     * session
+     */
+
+    private ArrayList<Session> sessionArrayList = new ArrayList<>();
+    /**
+     * 线程池
+     */
+    private ScheduledThreadPoolExecutor threadPool;
+
 
     @OnOpen
     public void onOpen(Session session) {
         System.out.println("WebSocket connection opened: " + session.getId());
+        sessionArrayList.add(session);
+
     }
 
     @OnMessage
