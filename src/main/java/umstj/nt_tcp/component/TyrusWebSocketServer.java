@@ -16,6 +16,12 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 @Component
 public class TyrusWebSocketServer {
     private static final Logger logger = LoggerFactory.getLogger(TyrusWebSocketServer.class);
+
+    public TyrusWebSocketServer(){
+        logger.info("TyrusWebSocketServer started on port 442 path /ws");
+    }
+
+
     /**
      * session
      */
@@ -38,6 +44,7 @@ public class TyrusWebSocketServer {
     public void onMessage(String message, Session session) {
         System.out.println("Received message from " + session.getId() + ": " + message);
 
+
         // 可以在此处添加处理收到消息的逻辑，然后向客户端发送响应
         // 例如：session.getBasicRemote().sendText("Response: " + message);
     }
@@ -46,4 +53,6 @@ public class TyrusWebSocketServer {
     public void onClose(Session session) {
         System.out.println("WebSocket connection closed: " + session.getId());
     }
+
+
 }

@@ -1,17 +1,16 @@
-package umstj.nt_tcp.DTO;
+package umstj.nt_tcp.entry.DTO;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import umstj.nt_tcp.component.TCPServer;
 
 import java.net.Socket;
 
 public class CarConnectDTO {
 
     @JSONField(alternateNames = "car_id")
-    private int carId;
+    private int vehicleNumber;
     private String type;
 
-    private String host;
+    private String ipAddress;
 
     private Socket clientSocket;
 
@@ -23,25 +22,25 @@ public class CarConnectDTO {
         this.clientSocket = clientSocket;
     }
 
-    public String getHost() {
-        return host;
+    public String getIpAddress() {
+        return ipAddress;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
     }
 
-    public CarConnectDTO(int carId, String type) {
-        carId = carId;
+    public CarConnectDTO(int vehicleNumber, String type) {
+        vehicleNumber = vehicleNumber;
         this.type = type;
     }
 
-    public int getCarId() {
-        return carId;
+    public int getVehicleNumber() {
+        return vehicleNumber;
     }
 
-    public void setCarId(int car_id) {
-        this.carId = car_id;
+    public void setVehicleNumber(int car_id) {
+        this.vehicleNumber = car_id;
     }
 
     public String getType() {
@@ -55,7 +54,7 @@ public class CarConnectDTO {
     @Override
     public String toString() {
         return "CarConnectDTO{" +
-                "car_id=" + carId +
+                "car_id=" + vehicleNumber +
                 ", type='" + type + '\'' +
                 '}';
     }

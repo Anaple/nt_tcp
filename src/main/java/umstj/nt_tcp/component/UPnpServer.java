@@ -21,6 +21,9 @@ public class UPnpServer {
     @Value("${upnp.server.port}")
     private int port;
 
+    @Value("${upnp.server.name}")
+    private String name;
+
     Logger logger = LoggerFactory.getLogger(UPnpServer.class);
 
     @PostConstruct
@@ -29,7 +32,7 @@ public class UPnpServer {
             logger.info("Bonjour Server is running on port " + port);
             jmdns = JmDNS.create(InetAddress.getLocalHost());
             String serviceType = "_http._tcp.local.";
-            String serviceName = "upnp_car_server";
+            String serviceName = name;
             ServiceInfo serviceInfo = ServiceInfo.create(serviceType, serviceName, port, serviceName);
             jmdns.registerService(serviceInfo);
 
@@ -49,8 +52,6 @@ public class UPnpServer {
                    // logger.info("Service resolved: " + event.getName() + " | IP: " + event.getInfo().getInetAddress());
                 }
             });
-
-
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import umstj.nt_tcp.DTO.CarConnectDTO;
+import umstj.nt_tcp.entry.DTO.CarConnectDTO;
 
 @Component
 public class TCPServer {
@@ -31,8 +31,6 @@ public class TCPServer {
 
     @PostConstruct
     public void start(){
-
-
 
         new Thread(() -> {
             try (ServerSocket serverSocket = new ServerSocket(port)) {
@@ -51,7 +49,7 @@ public class TCPServer {
         }).start();
     }
 
-    public static String socketRead(byte[] data) {
+    public static String socketRead(byte[] data, int bytesRead) {
         // 包头[FF AA]
         // 长度 第三 第四位
         Map<String, Object> maps = new HashMap<>();
@@ -66,7 +64,10 @@ public class TCPServer {
             String jsonStr = new String(jsonByte);
             return jsonStr;
         }
-        return new String(data);
+        if (bytesRead == -1){
+            return new String();
+        }
+        return new String(data, 0, bytesRead);
 
 
     }
@@ -105,13 +106,22 @@ public class TCPServer {
         }
     }
 
-    
+    public List<CarConnectDTO> getAllCarInfo(){
+        return carConnectList;
+    }
 
-    public void broadcastNavNode(int rfid ,int carId){
+
+    public void broadcastBaseMethods(String message){
         for (CarConnectDTO carConnectDTO : carConnectList){
-            if (carConnectDTO.getCarId() == carId){
-                sendMessages(carConnectDTO.getClientSocket(),"{\"type\": \"nav_end\", \"nav_end\":{\"plan_node \":"+rfid +"}}");
-                logger.info("{\"type\": \"nav_end\", \"nav_end\":{\"plan_node \":"+rfid +"}}");
+            sendMessages(carConnectDTO.getClientSocket(),message);
+        }
+
+    }
+
+    public void sendMessageBaseMethods(int vehicleNumber ,String message){
+        for (CarConnectDTO carConnectDTO : carConnectList){
+            if (carConnectDTO.getVehicleNumber() == vehicleNumber){
+                sendMessages(carConnectDTO.getClientSocket(),message);
             }
         }
 
@@ -138,21 +148,35 @@ public class TCPServer {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
                 bytesRead = in.read(buffer);
-                String message_rev = socketRead(buffer);
+                String message_rev = socketRead(buffer,bytesRead);
                 logger.info("Received message from client: " + message_rev);
-
+                boolean isNew = true;
+                CarConnectDTO carConnectDTO = new CarConnectDTO(0,"0");
                 try {
-                    CarConnectDTO carConnectDTO =  JSON.parseObject(message_rev, CarConnectDTO.class);
-
-                    logger.info(carConnectDTO.toString());
-                    carConnectDTO.setHost(this.clientId);
-                    carConnectDTO.setClientSocket(this.clientSocket);
-                    carConnectList.add(carConnectDTO);
-
+                    carConnectDTO =  JSON.parseObject(message_rev, CarConnectDTO.class);
+                    for (CarConnectDTO car:carConnectList) {
+                        if(car.getVehicleNumber() == carConnectDTO.getVehicleNumber()&&car.getIpAddress() == carConnectDTO.getIpAddress()){
+                            isNew = false;
+                            break;
+                        }
+                    }
+                    if (isNew){
+                        carConnectDTO.setIpAddress(this.clientId);
+                        carConnectDTO.setClientSocket(this.clientSocket);
+                        carConnectList.add(carConnectDTO);
+                        logger.info(carConnectList.toString());
+                    }
                 }catch (JSONException e){
-                 e.printStackTrace();
-
+                    e.printStackTrace();
                 }
+                while ((bytesRead) != -1) {
+                    // Process the received data here
+                    // ...
+                }
+                logger.info("disconnect "+clientSocket.getInetAddress().getHostAddress());
+                carConnectList.remove(carConnectDTO);
+
+
 
             } catch (IOException e) {
                 e.printStackTrace();

@@ -10,12 +10,12 @@ public class MessageController {
 
     private TCPServer tcpServer;
 
-    private UPnpServer uPnpServer;
+
 
     @Autowired
-    public MessageController(TCPServer tcpServer ,UPnpServer uPnpServer) {
+    public MessageController(TCPServer tcpServer) {
         this.tcpServer = tcpServer;
-        this.uPnpServer = uPnpServer;
+
     }
 
     @GetMapping("/")
@@ -23,13 +23,7 @@ public class MessageController {
         return "HTTP OK";
     }
 
-    @GetMapping("/send")
-    public String sendMessageToClients(@RequestParam("id") int id,@RequestParam("node") int node) {
-        // Send the message to all connected clients
-        tcpServer.broadcastNavNode(node,id);
 
-        return "Message sent to clients: navid ";
-    }
 
 
 }
